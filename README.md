@@ -21,9 +21,52 @@ File name	Purpose
 logic_gates.v	Logic-gate RTL
 logic_gates_tb.v	All input combinations and VCD generation
  # Verilog  Program
+module basic_gates (
+    input  wire a,
+    input  wire b,
+    output wire y_and,
+    output wire y_or,
+    output wire y_not
+);
 
+    assign y_and = a & b;   // AND gate
+    assign y_or  = a | b;   // OR gate
+    assign y_not = ~a;      // NOT gate (inverter)
+
+endmodule
 # **Test Bench Program**
+module tb2;
 
+    reg a, b;
+    wire y_and, y_or, y_not;
+
+    // Instantiate the design under test (DUT)
+    basic_gates uut (
+        .a(a),
+        .b(b),
+        .y_and(y_and),
+        .y_or(y_or),
+        .y_not(y_not)
+    );
+
+    initial begin
+        // ---- VCD dump setup ----
+        $dumpfile("basic_gates.vcd");   // name of the VCD file to be generated
+        $dumpvars(0, tb2);               // dump all signals in this testbench hierarchy
+
+        // ---- Apply all 4 input combinations ----
+        $monitor("Time=%0t a=%b b=%b | AND=%b OR=%b NOT(a)=%b", $time, a, b, y_and, y_or, y_not);
+
+        a = 0; b = 0; #10;
+        a = 0; b = 1; #10;
+        a = 1; b = 0; #10;
+        a = 1; b = 1; #10;
+
+        #10 $finish;
+#10;
+    end
+
+endmodule
 
 
 
@@ -70,6 +113,8 @@ Verify that y_and = 1 only when a=1 AND b=1 — the single combination where bot
 Verify that y_or = 1 whenever a=1 OR b=1 (any input high forces the output high).
 Verify that y_not is always the exact complement of a, regardless of b.
 The waveform should agree with the truth table.
+![Uploading WhatsApp Image 2026-11-05 at 8.08.02 AM.jpeg…]()
+
 # Expected Result
 The basic logic gates — AND, OR, and NOT — were realized using Verilog HDL:
 Y_AND = A.B
